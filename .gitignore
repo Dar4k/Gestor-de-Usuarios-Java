@@ -1,0 +1,35 @@
+# --- NetBeans ---
+/nbproject/private/
+/build/
+/dist/
+/nbbuild/
+/nbdist/
+/nbactions.xml
+/nb-configuration.xml
+
+# --- Archivos compilados ---
+*.class
+*.jar
+*.war
+*.ear
+
+# --- Logs ---
+*.log
+
+# --- Configuración de IDEs ---
+/.idea/
+/.vscode/
+/*.iml
+/eclipse/
+
+# --- Maven ---
+/target/
+/.mvn/
+
+# --- Gradle ---
+/build/
+/.gradle/
+
+# --- Archivos del sistema operativo ---
+.DS_Store
+Thumbs.db
