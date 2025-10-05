@@ -5,6 +5,8 @@ import Model.Usuario;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import java.io.File;
+import java.awt.*;
 
 public class ListaUsuarios extends javax.swing.JFrame {
 
@@ -15,86 +17,74 @@ public class ListaUsuarios extends javax.swing.JFrame {
 
     
     
-    
     public ListaUsuarios() {
         initComponents();
+        this.setTitle("Lista de Usuarios");
         setLocationRelativeTo(null);
         usuarioController = new UsuarioController();
         configurarComponentes();
+        
     }
 
     
-    
-    
     private void configurarComponentes() {
-        // 1. CONFIGURAR TABLA
-        String[] columnas = {"ID", "Identificación", "Nombre", "Correo", "Categoría"};
+
+        String[] columnas = {"ID", "Identificación", "Nombre", "Correo", "Categoría", "Estado"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        
-        
-        
-        tblUsuarios.setModel(modeloTabla);
 
+        tblUsuarios.setModel(modeloTabla);
         
-        
+
         btnEditar.setEnabled(false);
         btnEliminar.setEnabled(false);
 
-        
-        
         agregarListeners();
     }
+    
 
     private void agregarListeners() {
-        // Botón Listar
+
         btnListar.addActionListener(e -> cargarUsuarios());
 
-        // Botón Agregar
         btnAgregar.addActionListener(e -> abrirRegistroUsuario());
 
-        // Botón Editar  
         btnEditar.addActionListener(e -> editarUsuarioSeleccionado());
 
-        // Botón Eliminar
         btnEliminar.addActionListener(e -> eliminarUsuarioSeleccionado());
 
-        // Botón Exportar
         btnExportar.addActionListener(e -> exportarAPDF());
 
-        // Listener de selección en la tabla
         tblUsuarios.getSelectionModel().addListSelectionListener(e -> {
             boolean haySeleccion = tblUsuarios.getSelectedRow() != -1;
             btnEditar.setEnabled(haySeleccion);
             btnEliminar.setEnabled(haySeleccion);
         });
     }
-    
-    
-    
-    
+
     private void cargarUsuarios() {
         try {
-            modeloTabla.setRowCount(0); 
+            modeloTabla.setRowCount(0);
             List<Usuario> usuarios = usuarioController.obtenerTodosUsuarios();
-            
+
             for (Usuario usuario : usuarios) {
                 Object[] fila = {
                     usuario.getId(),
-                    usuario.getIdentificacion(), 
+                    usuario.getIdentificacion(),
                     usuario.getNombre(),
                     usuario.getCorreo(),
-                    usuario.getcategoria()
+                    usuario.getcategoria(),
+                    usuario.getEstadoTexto()
                 };
                 modeloTabla.addRow(fila);
             }
-            
+
             JOptionPane.showMessageDialog(this, "Usuarios cargados: " + usuarios.size());
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al cargar usuarios: " + e.getMessage());
             e.printStackTrace();
@@ -109,8 +99,19 @@ public class ListaUsuarios extends javax.swing.JFrame {
     private void editarUsuarioSeleccionado() {
         int filaSeleccionada = tblUsuarios.getSelectedRow();
         if (filaSeleccionada != -1) {
-            int id = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
-            JOptionPane.showMessageDialog(this, "Editar usuario ID: " + id);
+            try {
+                int identificacion = (int) modeloTabla.getValueAt(filaSeleccionada, 1);
+                Usuario usuarioAEditar = usuarioController.buscarUsuarioPorId(identificacion);
+
+                if (usuarioAEditar != null) {
+                    EditarUsuarioDesdeTabla ventanaEdicion = new EditarUsuarioDesdeTabla(usuarioAEditar, this::cargarUsuarios);
+                    ventanaEdicion.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró el usuario seleccionado");
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            }
         }
     }
 
@@ -118,11 +119,11 @@ public class ListaUsuarios extends javax.swing.JFrame {
         int filaSeleccionada = tblUsuarios.getSelectedRow();
         if (filaSeleccionada != -1) {
             int identificacion = (int) modeloTabla.getValueAt(filaSeleccionada, 1);
-            
-            int confirmacion = JOptionPane.showConfirmDialog(this, 
-                "¿Estás seguro de eliminar este usuario?", "Confirmar", 
-                JOptionPane.YES_NO_OPTION);
-                
+
+            int confirmacion = JOptionPane.showConfirmDialog(this,
+                    "¿Estás seguro de eliminar este usuario?", "Confirmar",
+                    JOptionPane.YES_NO_OPTION);
+
             if (confirmacion == JOptionPane.YES_OPTION) {
                 boolean eliminado = usuarioController.eliminarUsuario(identificacion);
                 if (eliminado) {
@@ -136,7 +137,77 @@ public class ListaUsuarios extends javax.swing.JFrame {
     }
 
     private void exportarAPDF() {
-        JOptionPane.showMessageDialog(this, "Aquí se exportará a PDF");
+        try {
+
+            // Diálogo para elegir donde guardar
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Guardar lista de usuarios");
+            fileChooser.setSelectedFile(new File("lista_usuarios.txt"));
+
+            int userSelection = fileChooser.showSaveDialog(this);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File archivo = fileChooser.getSelectedFile();
+                String ruta = archivo.getAbsolutePath();
+
+                // Crear el contenido del archivo
+                StringBuilder contenido = new StringBuilder();
+
+                // Título
+                contenido.append("=================================\n");
+                contenido.append("      LISTADO DE USUARIOS\n");
+                contenido.append("=================================\n\n");
+
+                // Encabezados de la tabla
+                contenido.append(String.format("%-5s %-15s %-20s %-25s %-15s %-10s\n",
+                        "ID", "Identificación", "Nombre", "Correo", "Categoría", "Estado"));
+                contenido.append(String.format("%-5s %-15s %-20s %-25s %-15s %-10s\n",
+                        "----", "-------------", "--------------------", "-------------------------", "---------------", "----------"));
+
+                // Datos de los usuarios
+                int rowCount = modeloTabla.getRowCount();
+
+                for (int fila = 0; fila < rowCount; fila++) {
+                    String id = modeloTabla.getValueAt(fila, 0).toString();
+                    String identificacion = modeloTabla.getValueAt(fila, 1).toString();
+                    String nombre = modeloTabla.getValueAt(fila, 2).toString();
+                    String correo = modeloTabla.getValueAt(fila, 3).toString();
+                    String categoria = modeloTabla.getValueAt(fila, 4).toString();
+                    String estado = modeloTabla.getValueAt(fila, 5).toString();
+
+                    contenido.append(String.format("%-5s %-15s %-20s %-25s %-15s %-15s\n",
+                            id, identificacion, nombre, correo, categoria, estado));
+                }
+
+                // Pie de página
+                contenido.append("\n=================================\n");
+                contenido.append("TOTAL DE USUARIOS: ").append(rowCount).append("\n");
+                contenido.append("FECHA DE GENERACIÓN: ").append(new java.util.Date()).append("\n");
+                contenido.append("=================================\n");
+
+                // Escribir el archivo
+                java.io.FileWriter writer = new java.io.FileWriter(archivo);
+                writer.write(contenido.toString());
+                writer.close();
+
+                JOptionPane.showMessageDialog(this,
+                        "✅ Archivo exportado exitosamente!\n\n"
+                        + "📁 Ubicación: " + ruta + "\n"
+                        + "👥 Usuarios exportados: " + rowCount,
+                        "Exportación Exitosa",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+            } else {
+                JOptionPane.showMessageDialog(this, "Exportación cancelada");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "❌ Error al exportar: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -207,35 +278,37 @@ public class ListaUsuarios extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGap(33, 33, 33)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(33, 33, 33)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 724, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(44, 44, 44)
                         .addComponent(btnListar)
-                        .addGap(41, 41, 41)
+                        .addGap(63, 63, 63)
                         .addComponent(btnAgregar)
-                        .addGap(43, 43, 43)
+                        .addGap(70, 70, 70)
                         .addComponent(btnEditar)
-                        .addGap(41, 41, 41)
-                        .addComponent(btnEliminar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnExportar)))
-                .addGap(119, 119, 119))
+                        .addGap(291, 291, 291)
+                        .addComponent(btnEliminar))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 724, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(btnExportar)
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(88, 88, 88)
+                        .addComponent(btnExportar)))
+                .addGap(27, 27, 27)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnListar)
                     .addComponent(btnAgregar)
                     .addComponent(btnEditar)
-                    .addComponent(btnEliminar)
-                    .addComponent(btnExportar))
+                    .addComponent(btnEliminar))
                 .addContainerGap(51, Short.MAX_VALUE))
         );
 

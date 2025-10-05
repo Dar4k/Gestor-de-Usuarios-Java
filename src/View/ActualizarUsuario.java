@@ -9,6 +9,7 @@ public class ActualizarUsuario extends javax.swing.JFrame {
     private UsuarioController usuarioController;
     private Usuario usuarioActual;
     private Usuario usuarioEncontrado;
+    private javax.swing.JCheckBox chkEstado;
     
     public ActualizarUsuario(Usuario usuarioActual) {
         initComponents();
