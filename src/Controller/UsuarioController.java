@@ -17,7 +17,7 @@ public class UsuarioController {
     }
 
     public void crearUsuario(int identificacion, String nombre, String correo, String Contraseña, String categoria, boolean estado) throws ClassNotFoundException {
-        Usuario usuario = new Usuario(identificacion, nombre, correo, Contraseña, categoria, estado);
+        Usuario usuario = new Usuario(identificacion, nombre, correo, Contraseña, categoria, true);
         usuarioService.agregarUsuario(usuario);
     }
 
