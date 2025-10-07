@@ -45,6 +45,11 @@ private Usuario usuario;
         jButton1.setText("Lista de usuarios");
 
         jButton2.setText("Indicadores");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -97,6 +102,12 @@ private Usuario usuario;
         login.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_closeSesionActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        Indicador indicador = new Indicador(this.usuario);
+        indicador.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
