@@ -5,6 +5,9 @@ import BD.Conexion;
 import Controller.SecuriteController;
 import Model.Usuario;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class UsuarioService extends Conexion {
 
@@ -147,5 +150,36 @@ public class UsuarioService extends Conexion {
         return usuarios;
     }
     
+    public Map<String, Integer> contarUsuariosPorRol() throws SQLException {
+    String sql = "SELECT Categoria, COUNT(*) AS total FROM usuario GROUP BY Categoria";
+    Map<String, Integer> resultado = new HashMap<>();
     
+        try (var ps = conn.prepareStatement(sql);
+             var rs = ps.executeQuery()) {
+            while (rs.next()) {
+                resultado.put(rs.getString("Categoria"), rs.getInt("total"));
+            }
+        }
+        return resultado;
+    }
+    
+    public Map<String, Integer> contarIniciosPorFecha() throws SQLException {
+    String sql = """
+        SELECT DATE(ultima_sesion) AS fecha, COUNT(*) AS total
+        FROM Usuario
+        WHERE ultima_sesion IS NOT NULL
+        GROUP BY DATE(ultima_sesion)
+        ORDER BY fecha ASC
+    """;
+
+    Map<String, Integer> resultado = new LinkedHashMap<>();
+
+        try (var ps = conn.prepareStatement(sql);
+             var rs = ps.executeQuery()) {
+            while (rs.next()) {
+                resultado.put(rs.getString("fecha"), rs.getInt("total"));
+            }
+        }
+        return resultado;
+    }
 }
