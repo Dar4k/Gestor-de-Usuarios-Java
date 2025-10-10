@@ -12,10 +12,18 @@ import java.util.Map;
 public class UsuarioService extends Conexion {
 
     Connection conn = getConexion();
+    private CambioUsuarioService cambioService;
+    
+     public UsuarioService() {
+        // Inicializa el servicio de registro de cambios
+        this.cambioService = new CambioUsuarioService(); 
+    }
 
-    public boolean agregarUsuario(Usuario usuario) throws ClassNotFoundException {
+
+    public boolean agregarUsuario(Usuario usuario,String usuarioSistema) throws ClassNotFoundException {
 
         String sql = "INSERT INTO Usuario (identificacion, nombre, correo, Contraseña, categoria, Estado) VALUES (?, ?, ?, ?, ?, ?)";
+         boolean exito = false; 
 
         try {
             var ps = conn.prepareStatement(sql);
@@ -25,13 +33,14 @@ public class UsuarioService extends Conexion {
             ps.setString(4, usuario.getContraseña().toString());
             ps.setString(5, usuario.getcategoria());
             ps.setBoolean(6, true);
-            ps.execute();
+            int filas = ps.executeUpdate();
+            exito = filas > 0;
 
-            return true;
 
         } catch (SQLException e) {
-            return false;
+            e.printStackTrace();
         }
+        return exito;
     }
 
     public Usuario iniciarSesion(String correo, String clave) throws SQLException {
@@ -66,8 +75,9 @@ public class UsuarioService extends Conexion {
         return null;
     }
 
-    public boolean actualizarUsuario(Usuario usuario) throws ClassNotFoundException {
+    public boolean actualizarUsuario(Usuario usuario,String usuarioSistema) throws ClassNotFoundException {
         String sql = "UPDATE Usuario SET nombre=?, correo=?, Contraseña=?, categoria=?, Estado=? WHERE identificacion=?";
+        boolean exito = false;
         try {
             var ps = conn.prepareStatement(sql);
         ps.setString(1, usuario.getNombre());
@@ -78,10 +88,12 @@ public class UsuarioService extends Conexion {
         ps.setBoolean(5, usuario.isEstado());
         ps.setInt(6, usuario.getIdentificacion());
 
-            int filas = ps.executeUpdate();
-            return filas > 0;
+           int filas = ps.executeUpdate();
+            exito = filas > 0;
+            
+           return exito;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error al actualizar usuario: " + e.getMessage());
             return false;
         }
     }
@@ -112,15 +124,22 @@ public class UsuarioService extends Conexion {
         return null;
     }
 
-    public boolean eliminarUsuario(int identificacion) {
+    public boolean eliminarUsuario(int identificacion,String usuarioSistema) {
+        Usuario usuarioEliminado = buscarUsuarioPorId(identificacion); 
+        
         String sql = "UPDATE Usuario set Estado = 0 WHERE identificacion = ?";
+        boolean exito = false;
         try {
             var ps = conn.prepareStatement(sql);
             ps.setInt(1, identificacion);
+            
             int filas = ps.executeUpdate();
-            return filas > 0;
+            exito = filas > 0;
+            
+             
+            return exito;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error al inactivar usuario: " + e.getMessage());
             return false;
         }
     }
@@ -183,3 +202,4 @@ public class UsuarioService extends Conexion {
         return resultado;
     }
 }
+    
