@@ -54,6 +54,11 @@ private Usuario usuario;
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/indicador-clave-de-rendimiento (1).png"))); // NOI18N
         jButton2.setText("Indicadores");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -107,11 +112,11 @@ private Usuario usuario;
         this.dispose();
     }//GEN-LAST:event_closeSesionActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        ListaUsuarios listaUsuarios = new ListaUsuarios(this.usuario); 
-        listaUsuarios.setVisible(true);
-        this.dispose();       // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        Indicador indicador = new Indicador(this.usuario);
+        indicador.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments

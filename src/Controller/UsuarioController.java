@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class UsuarioController {
 
@@ -89,23 +90,12 @@ public class UsuarioController {
     }
 
     
-    private void registrarCambio(String accion, String detalle) {
-        try {
-            CambioUsuario cambio = new CambioUsuario();
-            cambio.setFechaHora(new Date());
-            cambio.setAccion(accion);
-
-            
-            if (Login.usuarioActivo != null) {
-                cambio.setUsuarioSistema(Login.usuarioActivo.getNombre());
-            } else {
-                cambio.setUsuarioSistema("Desconocido");
-            }
-
-            cambio.setDetalle(detalle);
-            cambioService.registrarCambio(cambio);
-        } catch (Exception e) {
-            System.err.println("Error al registrar cambio en historial: " + e.getMessage());
-        }
+    public Map<String, Integer> obtenerIndicadoresActividad(int dias) throws SQLException {
+        return usuarioService.contarUsuariosPorRol();
     }
+    
+    public Map<String, Integer> obtenerIniciosPorFecha() throws SQLException {
+        return usuarioService.contarIniciosPorFecha();
+    }
+    
 }
