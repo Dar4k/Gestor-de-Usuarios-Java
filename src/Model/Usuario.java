@@ -1,5 +1,6 @@
 package Model;
 
+
 public class Usuario {
     public int ID;
     public int identificacion;
