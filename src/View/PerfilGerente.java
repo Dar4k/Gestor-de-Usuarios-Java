@@ -30,8 +30,10 @@ public PerfilGerente() {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        btnHistorial = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(255, 255, 255));
 
         labelNameGerente.setText("Bienvenido");
 
@@ -46,6 +48,7 @@ public PerfilGerente() {
 
         labelCategoriaGerente.setText("jLabel2");
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/rotacion.png"))); // NOI18N
         jButton1.setText("Actualizar datos");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -53,6 +56,7 @@ public PerfilGerente() {
             }
         });
 
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/indicador-clave-de-rendimiento (1).png"))); // NOI18N
         jButton2.setText("Indicadores");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -60,10 +64,19 @@ public PerfilGerente() {
             }
         });
 
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/cliente (1).png"))); // NOI18N
         jButton3.setText("lista de Usuarios");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
+            }
+        });
+
+        btnHistorial.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/historial-de-transacciones.png"))); // NOI18N
+        btnHistorial.setText("Historial de Cambios");
+        btnHistorial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHistorialActionPerformed(evt);
             }
         });
 
@@ -80,11 +93,12 @@ public PerfilGerente() {
                             .addComponent(labelCorreoGerente, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(labelNameGerente)
                             .addComponent(labelCategoriaGerente, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE))
+                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnHistorial, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(115, 115, 115))
         );
         layout.setVerticalGroup(
@@ -102,7 +116,9 @@ public PerfilGerente() {
                 .addComponent(labelCategoriaGerente)
                 .addGap(9, 9, 9)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 106, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(btnHistorial, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
                 .addComponent(closeSesion)
                 .addContainerGap())
         );
@@ -127,10 +143,16 @@ public PerfilGerente() {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        ListaUsuarios listaUsuarios = new ListaUsuarios();
+        ListaUsuarios listaUsuarios = new ListaUsuarios(this.usuario); 
         listaUsuarios.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed
+        HistoricoCambios HistoricoCambios = new HistoricoCambios(this.usuario);
+        HistoricoCambios.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnHistorialActionPerformed
 
     /**
      * @param args the command line arguments
@@ -192,6 +214,7 @@ public PerfilGerente() {
 
      }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnHistorial;
     private javax.swing.JButton closeSesion;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

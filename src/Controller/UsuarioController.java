@@ -1,59 +1,111 @@
 package Controller;
 
 import Model.Usuario;
+import Model.CambioUsuario;
 import Service.UsuarioService;
+import Service.CambioUsuarioService;
+import View.Login;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 
 public class UsuarioController {
 
-    public UsuarioService usuarioService;
+    private UsuarioService usuarioService;
+    private CambioUsuarioService cambioService;
 
     public UsuarioController() {
         this.usuarioService = new UsuarioService();
+        this.cambioService = new CambioUsuarioService();
     }
 
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
+        this.cambioService = new CambioUsuarioService();
     }
 
-    public void crearUsuario(int identificacion, String nombre, String correo, String Contraseña, String categoria, boolean estado) throws ClassNotFoundException {
-        Usuario usuario = new Usuario(identificacion, nombre, correo, Contraseña, categoria, true);
-        usuarioService.agregarUsuario(usuario);
+   
+   public void crearUsuario(int identificacion, String nombre, String correo, String Contraseña, String categoria, boolean estado) throws ClassNotFoundException {
+        Usuario usuario = new Usuario(identificacion, nombre, correo, Contraseña, categoria, estado);
+        
+        
+        String usuarioSistema = (Login.usuarioActivo != null) ? Login.usuarioActivo.getNombre() : "Desconocido";
+        
+        usuarioService.agregarUsuario(usuario, usuarioSistema);
+        registrarCambio("CREAR", "Usuario creado: " + nombre);
     }
 
+    
     public Usuario loginUsuario(String correo, String clave) throws SQLException {
         return usuarioService.iniciarSesion(correo, clave);
     }
 
+
     public boolean actualizarUsuario(Usuario usuario) {
-        UsuarioService service = new UsuarioService();
         try {
-            return service.actualizarUsuario(usuario);
+           
+            String usuarioSistema = (Login.usuarioActivo != null) ? Login.usuarioActivo.getNombre() : "Desconocido";
+            
+            boolean actualizado = usuarioService.actualizarUsuario(usuario, usuarioSistema);
+            if (actualizado) {
+                registrarCambio("ACTUALIZAR", "Usuario actualizado: " + usuario.getNombre());
+            }
+            return actualizado;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public Usuario buscarUsuarioPorId(int identificacion) throws SQLException {
+        return usuarioService.buscarUsuarioPorId(identificacion);
+    }
+
+    
+    public boolean eliminarUsuario(int identificacion) {
+        try {
+            
+            String usuarioSistema = (Login.usuarioActivo != null) ? Login.usuarioActivo.getNombre() : "Desconocido";
+            
+            boolean eliminado = usuarioService.eliminarUsuario(identificacion, usuarioSistema);
+            if (eliminado) {
+                registrarCambio("ELIMINAR", "Usuario eliminado con ID: " + identificacion);
+            }
+            return eliminado;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public Usuario buscarUsuarioPorId(int identificacion) throws SQLException {
-        return usuarioService.buscarUsuarioPorId(identificacion);
-    }
-
-    public boolean eliminarUsuario(int identificacion) {
-        try {
-            return usuarioService.eliminarUsuario(identificacion);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public java.util.List<Usuario> obtenerTodosUsuarios() {
+    
+    public List<Usuario> obtenerTodosUsuarios() {
         try {
             return usuarioService.obtenerTodosUsuarios();
         } catch (Exception e) {
-            return new java.util.ArrayList<>();
+            return new ArrayList<>();
         }
     }
+
     
-    
+    private void registrarCambio(String accion, String detalle) {
+        try {
+            CambioUsuario cambio = new CambioUsuario();
+            cambio.setFechaHora(new Date());
+            cambio.setAccion(accion);
+
+            
+            if (Login.usuarioActivo != null) {
+                cambio.setUsuarioSistema(Login.usuarioActivo.getNombre());
+            } else {
+                cambio.setUsuarioSistema("Desconocido");
+            }
+
+            cambio.setDetalle(detalle);
+            cambioService.registrarCambio(cambio);
+        } catch (Exception e) {
+            System.err.println("Error al registrar cambio en historial: " + e.getMessage());
+        }
+    }
 }

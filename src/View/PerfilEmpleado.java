@@ -28,6 +28,8 @@ private Usuario usuario;
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setAutoRequestFocus(false);
+        setBackground(new java.awt.Color(0, 102, 102));
 
         labelNameGerente.setText("Bienvenido");
 
@@ -42,8 +44,15 @@ private Usuario usuario;
 
         labelCategoriaGerente.setText("jLabel1");
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/cliente (1).png"))); // NOI18N
         jButton1.setText("Lista de usuarios");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/indicador-clave-de-rendimiento (1).png"))); // NOI18N
         jButton2.setText("Indicadores");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -97,6 +106,12 @@ private Usuario usuario;
         login.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_closeSesionActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        ListaUsuarios listaUsuarios = new ListaUsuarios(this.usuario); 
+        listaUsuarios.setVisible(true);
+        this.dispose();       // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
