@@ -8,8 +8,6 @@ import javax.swing.JOptionPane;
 public class Login extends javax.swing.JFrame {
     UsuarioController usuarioController;
     UsuarioService usuarioService;
-    
-    public static Usuario usuarioActivo;
 
     public Login() {
         initComponents();
@@ -122,7 +120,7 @@ public class Login extends javax.swing.JFrame {
                 }
             } catch(Exception e){
                 JOptionPane.showMessageDialog(this, "Error al iniciar sesion");
-                System.out.println(e);  
+                System.out.println(e);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Los campos son obligatorios");
