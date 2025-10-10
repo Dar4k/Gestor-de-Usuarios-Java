@@ -14,6 +14,7 @@ public class ListaUsuarios extends javax.swing.JFrame {
     
     private DefaultTableModel modeloTabla;
     private UsuarioController usuarioController;
+    private Usuario usuarioActual;
 
     
     
@@ -24,6 +25,10 @@ public class ListaUsuarios extends javax.swing.JFrame {
         usuarioController = new UsuarioController();
         configurarComponentes();
         
+    }
+    public ListaUsuarios(Usuario usuario) {
+        this(); // Llama al constructor sin argumentos para inicializar componentes (initComponents(), etc.)
+        this.usuarioActual = usuario; // Guarda el usuario que te abrio la ventana
     }
 
     
@@ -226,6 +231,7 @@ public class ListaUsuarios extends javax.swing.JFrame {
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnExportar = new javax.swing.JButton();
+        Regresar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -261,6 +267,11 @@ public class ListaUsuarios extends javax.swing.JFrame {
 
         btnEditar.setBackground(new java.awt.Color(153, 102, 0));
         btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         btnEliminar.setBackground(new java.awt.Color(153, 0, 0));
         btnEliminar.setText("Eliminar");
@@ -272,6 +283,13 @@ public class ListaUsuarios extends javax.swing.JFrame {
 
         btnExportar.setBackground(new java.awt.Color(0, 102, 102));
         btnExportar.setText("Exportar");
+
+        Regresar.setText("Menu");
+        Regresar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RegresarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -290,7 +308,9 @@ public class ListaUsuarios extends javax.swing.JFrame {
                         .addComponent(btnEliminar))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 724, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(btnExportar)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnExportar)
+                    .addComponent(Regresar))
                 .addContainerGap(27, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -326,6 +346,31 @@ public class ListaUsuarios extends javax.swing.JFrame {
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void RegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RegresarActionPerformed
+ if (usuarioActual != null) {
+        if (usuarioActual.getcategoria().equalsIgnoreCase("Gerente")) {
+            PerfilGerente perfil = new PerfilGerente(usuarioActual);
+            perfil.setVisible(true);
+        } else if (usuarioActual.getcategoria().equalsIgnoreCase("Empleado")) {
+            PerfilEmpleado perfil = new PerfilEmpleado(usuarioActual);
+            perfil.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Categoría desconocida o estado inactivo: " + usuarioActual.getcategoria());
+        }
+        this.dispose(); // Cierra la ventana actual
+    } else {
+        JOptionPane.showMessageDialog(this, "No hay usuario en sesión. Regresando al login...");
+        Login login = new Login();
+        login.setVisible(true);
+        this.dispose();
+    }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_RegresarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -363,6 +408,7 @@ public class ListaUsuarios extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Regresar;
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
