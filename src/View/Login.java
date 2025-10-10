@@ -107,17 +107,15 @@ public class Login extends javax.swing.JFrame {
             try{
                 Usuario resultado = usuarioController.loginUsuario(correo, clave);
                 if (resultado != null) {
-                    usuarioActivo = resultado;
-                    if(resultado.getcategoria().equalsIgnoreCase("Gerente")){
+                    if(resultado.getcategoria().equalsIgnoreCase("Gerente") && resultado.isEstado() == true){
                         PerfilGerente perfil = new PerfilGerente(resultado);
                         perfil.setVisible(true);
-                    } else if (resultado.getcategoria().equalsIgnoreCase("Empleado")){
+                    } else if (resultado.getcategoria().equalsIgnoreCase("Empleado") && resultado.isEstado() == true){
                         PerfilEmpleado perfil = new PerfilEmpleado(resultado);
                         perfil.setVisible(true);
                     }else {
-                        JOptionPane.showMessageDialog(this, "Categoria desconocida o Estado inactivo:" + resultado.getcategoria());
+                        JOptionPane.showMessageDialog(this, "Categoria desconocida o Estado inactivo:");
                     }
-                    
                     this.dispose();
                 } else{
                     JOptionPane.showMessageDialog(this, "Correo o contraseña incorrectos");
