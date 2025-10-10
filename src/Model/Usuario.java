@@ -19,7 +19,7 @@ public class Usuario {
         this.correo = correo;
         this.contraseña = contraseña;
         this.Categoria = Categoria;
-        this.Estado = true;
+        this.Estado = estado;
     }
 
     public int getId() {
@@ -86,5 +86,9 @@ public class Usuario {
         this.Estado = Estado;
     }
     
+    
+    public String getEstadoTexto(){
+        return Estado ? "Activo" : "Inactivo";
+    }
     
 }

@@ -3,6 +3,7 @@ package Controller;
 import Model.Usuario;
 import Service.UsuarioService;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class UsuarioController {
 
@@ -17,7 +18,7 @@ public class UsuarioController {
     }
 
     public void crearUsuario(int identificacion, String nombre, String correo, String Contraseña, String categoria, boolean estado) throws ClassNotFoundException {
-        Usuario usuario = new Usuario(identificacion, nombre, correo, Contraseña, categoria, estado);
+        Usuario usuario = new Usuario(identificacion, nombre, correo, Contraseña, categoria, true);
         usuarioService.agregarUsuario(usuario);
     }
 
@@ -55,5 +56,12 @@ public class UsuarioController {
         }
     }
     
+    public Map<String, Integer> obtenerIndicadoresActividad(int dias) throws SQLException {
+        return usuarioService.contarUsuariosPorRol();
+    }
+    
+    public Map<String, Integer> obtenerIniciosPorFecha() throws SQLException {
+        return usuarioService.contarIniciosPorFecha();
+    }
     
 }

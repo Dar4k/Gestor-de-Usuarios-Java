@@ -5,6 +5,9 @@ import BD.Conexion;
 import Controller.SecuriteController;
 import Model.Usuario;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class UsuarioService extends Conexion {
 
@@ -64,15 +67,16 @@ public class UsuarioService extends Conexion {
     }
 
     public boolean actualizarUsuario(Usuario usuario) throws ClassNotFoundException {
-        String sql = "UPDATE Usuario SET nombre=?, correo=?, Contraseña=?, categoria=? WHERE identificacion=?";
+        String sql = "UPDATE Usuario SET nombre=?, correo=?, Contraseña=?, categoria=?, Estado=? WHERE identificacion=?";
         try {
             var ps = conn.prepareStatement(sql);
-            ps.setString(1, usuario.getNombre());
-            ps.setString(2, usuario.getCorreo());
-            String hash = SecuriteController.hashClave(usuario.getContraseña());
-            ps.setString(3, hash);
-            ps.setString(4, usuario.getcategoria());
-            ps.setInt(5, usuario.getIdentificacion());
+        ps.setString(1, usuario.getNombre());
+        ps.setString(2, usuario.getCorreo());
+        String hash = SecuriteController.hashClave(usuario.getContraseña());
+        ps.setString(3, hash);
+        ps.setString(4, usuario.getcategoria());
+        ps.setBoolean(5, usuario.isEstado());
+        ps.setInt(6, usuario.getIdentificacion());
 
             int filas = ps.executeUpdate();
             return filas > 0;
@@ -83,22 +87,24 @@ public class UsuarioService extends Conexion {
     }
 
     public Usuario buscarUsuarioPorId(int identificacion) {
-        String sql = "SELECT ID, identificacion, Nombre, correo, Contraseña, categoria FROM Usuario WHERE identificacion = ?";
+        String sql = "SELECT ID, identificacion, Nombre, correo, Contraseña, categoria, Estado FROM Usuario WHERE identificacion = ?";
 
         try {
             var ps = conn.prepareStatement(sql);
             ps.setInt(1, identificacion);
             var rs = ps.executeQuery();
 
-            if (rs.next()) {
-                Usuario usuario = new Usuario();
-                usuario.setIdentificacion(rs.getInt("identificacion"));
-                usuario.setNombre(rs.getString("Nombre"));
-                usuario.setCorreo(rs.getString("correo"));
-                usuario.setContraseña(rs.getString("Contraseña"));
-                usuario.setcategoria(rs.getString("categoria"));
-                return usuario;
-            }
+           if (rs.next()) {
+            Usuario usuario = new Usuario();
+            usuario.setId(rs.getInt("ID")); 
+            usuario.setIdentificacion(rs.getInt("identificacion"));
+            usuario.setNombre(rs.getString("Nombre"));
+            usuario.setCorreo(rs.getString("correo"));
+            usuario.setContraseña(rs.getString("Contraseña"));
+            usuario.setcategoria(rs.getString("categoria"));
+            usuario.setEstado(rs.getBoolean("Estado")); 
+            return usuario;
+        }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -120,7 +126,7 @@ public class UsuarioService extends Conexion {
     }
 
     public java.util.List<Usuario> obtenerTodosUsuarios() {
-        String sql = "SELECT ID, identificacion, Nombre, correo, Contraseña, categoria FROM Usuario";
+        String sql = "SELECT ID, identificacion, Nombre, correo, Contraseña, categoria, Estado FROM Usuario";
         java.util.List<Usuario> usuarios = new java.util.ArrayList<>();
 
         try {
@@ -135,6 +141,7 @@ public class UsuarioService extends Conexion {
                 usuario.setCorreo(rs.getString("correo"));
                 usuario.setContraseña(rs.getString("Contraseña"));
                 usuario.setcategoria(rs.getString("categoria"));
+                usuario.setEstado(rs.getBoolean("Estado"));
                 usuarios.add(usuario);
             }
         } catch (SQLException e) {
@@ -143,12 +150,36 @@ public class UsuarioService extends Conexion {
         return usuarios;
     }
     
+    public Map<String, Integer> contarUsuariosPorRol() throws SQLException {
+    String sql = "SELECT Categoria, COUNT(*) AS total FROM usuario GROUP BY Categoria";
+    Map<String, Integer> resultado = new HashMap<>();
     
-    /*public Usuario buscarUsuario(int id) {
-        
-    }*/
+        try (var ps = conn.prepareStatement(sql);
+             var rs = ps.executeQuery()) {
+            while (rs.next()) {
+                resultado.put(rs.getString("Categoria"), rs.getInt("total"));
+            }
+        }
+        return resultado;
+    }
+    
+    public Map<String, Integer> contarIniciosPorFecha() throws SQLException {
+    String sql = """
+        SELECT DATE(ultima_sesion) AS fecha, COUNT(*) AS total
+        FROM Usuario
+        WHERE ultima_sesion IS NOT NULL
+        GROUP BY DATE(ultima_sesion)
+        ORDER BY fecha ASC
+    """;
 
- /* public List<Usuario> obtenerUsduarios(){
-        
-    }*/
+    Map<String, Integer> resultado = new LinkedHashMap<>();
+
+        try (var ps = conn.prepareStatement(sql);
+             var rs = ps.executeQuery()) {
+            while (rs.next()) {
+                resultado.put(rs.getString("fecha"), rs.getInt("total"));
+            }
+        }
+        return resultado;
+    }
 }
